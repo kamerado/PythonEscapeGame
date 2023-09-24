@@ -41,15 +41,12 @@ room_desc = {
     'Dark Room': 'You are in a dark room with loud tunes.',
     'Party Room': 'You are in a what looks like a party room.',
     'Boiler Room': 'You are in a small boiler room, you see some loose pipe.',
-    'Dining Room': 'You find an angry looking man eating at a table. \
-He looks angry.',
+    'Dining Room': 'You find an angry looking man eating at a table. He looks angry.',
 
     'Closet Room': 'You find a room containing shelfs.',
-    'Living Room': 'You wander down into the Living Room, there are many storage \
-boxes.',
+    'Living Room': 'You wander down into the Living Room, there are many storage boxes.',
 
-    'Bathroom': 'You walk into a bathroom, it smells like someone died in \
-here.',
+    'Bathroom': 'You walk into a bathroom, it smells like someone died in here.',
 
     'Hallway': 'You find the front hallway, but see an angry, huge man.',
     'Escape!': 'You are outside.'}
@@ -69,7 +66,8 @@ rooms = {
 # define items and coresponding rooms.
 items = {
     'Dark Room': 'healing potion',
-    'Party Room': 'duck tape',
+    'Dining Room': 'magic stone',
+    'Party Room': 'cloth',
     'Boiler Room': 'pipe',
     'Closet Room': 'healing potion',
     'Living Room': 'steel file',
@@ -130,14 +128,13 @@ class players():
 villan = players.enemy('The badman', 250, 20, 40, 'Hallway')
 guard = players.enemy('Dumb Henchman', 50, 0, 15, 'Dining Room')
 
-# small introduction to the game, allows you to give yourself a name,
-# then initializes player object.
+# small introduction into the game, allows you to give yourself a name,
 clear()
 print('\nRandom man: Finally you\'re awake! Whats your name?')
-playername = input('Enter name: ')
-player1 = players.hero(playername)
+playername = input('Enter username: ') # allowing user to input a username. You could use this to make a leaderboard.
+player = players.hero(playername) # initialize player object.
 clear()
-print('\nWell...', player1.name + '...\nWe\'ve been captured by the a group')
+print('\nWell...', player.name + '...\nWe\'ve been captured by the a group')
 print('of raiders who plan to hold us for randsom...')
 action = ''
 while action != 'e':  # using while loop to make sure program won't crash.
@@ -149,21 +146,21 @@ time.sleep(2)
 
 # defines a function to show current room, hp, inventory, and weapon.
 def status():
-    print('Current room is:', player1.current_room + '.')
-    print('Current hp is', str(player1.hp) + '.')
-    if player1.items is not None:
-        print('Current items are:', str(player1.items) + '.')
-    elif player1.items is None:
+    print('Current room is:', player.current_room + '.')
+    print('Current hp is', str(player.hp) + '.')
+    if player.items is not None:
+        print('Current items are:', str(player.items) + '.')
+    elif player.items is None:
         print('You currently have no items.')
-    if player1.weapon is False:
+    if player.weapon is False:
         print('You have no weapon.')
-    elif player1.weapon == 'sharpened pipe':
+    elif player.weapon == 'sharpened pipe':
         print('You have a sharpeded pipe.')
 
 
 # defines a function to handle attack sequences.
 def attack(attacker, attacking, enemy):
-    if attacker == player1:
+    if attacker == player:
         attacking.takedamage(attacker.calcdam(), attacking)
         time.sleep(2)
     elif attacker == enemy:
@@ -174,31 +171,31 @@ def attack(attacker, attacking, enemy):
 # defines a function that allows the player to use an item.
 def use_item():
     clear()
-    text = "\n".join("> [{}] {}".format(n, i) for n, i in
-                     enumerate(player1.items, start=1))
+    # enumerates through player.items, shows enumerating number next to each item making it easier to select an item.
+    text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(player.items, start=1))
     
-    if 'healing potion' in player1.items or 'resistance potion'\
-            in player1.items:
+    
+    if 'healing potion' in player.items or 'resistance potion' in player.items or 'magic stone' in player.items:
         print('Select an item to use: (1, 2 , 3 etc).')
         use = input(f'Type \'exit\' to exit menu \n{text}\n')
         if use == 'e' or use == 'exit':
-            return None
-        elif player1.items[int(use) - 1] in player1.items:
-            if player1.items[int(use) - 1] == 'healing potion':
-                player1.items.remove(player1.items[int(use) - 1])
-                player1.hp += 50
+            return
+        elif player.items[int(use) - 1] in player.items:
+            if player.items[int(use) - 1] == 'healing potion':
+                player.items.remove(player.items[int(use) - 1])
+                player.hp += 50
                 clear()
                 print('You gain 50 health.')
                 time.sleep(2)
-            elif player1.items[int(use) - 1] == 'resistance potion':
-                player1.items.remove(player1.items[int(use) - 1])
-                player1.d_resistance += 15
+            elif player.items[int(use) - 1] == 'resistance potion':
+                player.items.remove(player.items[int(use) - 1])
+                player.d_resistance += 15
                 clear()
                 print('-1 Resistance Potion')
                 print('+15 damage resistance.')
                 time.sleep(2)
-            elif player1.items[int(use) - 1] == 'pipe'\
-                    or player1.items[int(use) - 1] == 'steel file':
+            elif player.items[int(use) - 1] == 'pipe'\
+                    or player.items[int(use) - 1] == 'steel file':
 
                 clear()
                 print('This item can only be used to craft another item.')
@@ -210,8 +207,8 @@ def use_item():
                 time.sleep(1.5)
                 use_item()
 
-    elif 'healing potion' not in player1.items or 'resistance potion' not in\
-            player1.items:
+    elif 'healing potion' not in player.items or 'resistance potion' not in\
+            player.items:
 
         print('You have no items to use.')
         time.sleep(2)
@@ -260,15 +257,16 @@ def fight(hero, enemy, first_move):
 
 # defines the function to craft the weapon needed to beat the main villan.
 def craft():
-    if 'pipe' in player1.items and 'steel file' in player1.items\
-            and 'duck tape' in player1.items:
+    if 'pipe' in player.items and 'steel file' in player.items\
+            and 'cloth' in player.items:
         clear()
         print('You can craft a sharpened pipe.')
         action = input('Do you wish to craft a sharpened pipe? (y/n)\n')
         if action == 'y':
-            player1.d_mult = 2
-            player1.items.remove('pipe')
-            player1.items.remove('duck tape')
+            player.d_mult = 2
+            player.items.remove('pipe')
+            player.items.remove('cloth')
+            
             clear()
             print('You have crafted a sharpened pipe.')
             time.sleep(2)
@@ -277,8 +275,8 @@ def craft():
             print('You might want to craft this item...')
             choice = input('Do you wish to craft item anyway? (y/n)\n')
             if choice == 'y':
-                player1.d_mult = 2
-                player1.items.pop('pipe')
+                player.d_mult = 2
+                player.items.pop('pipe')
                 clear()
         else:
             clear()
@@ -300,9 +298,12 @@ def search_room(room):
         if choice == 'y':
             try:
                 clear()
+                if items[room] == 'magic stone':
+                    print(f'+ 10% resistance.')
+                    player.d_resistance += 10
                 print(f'You have taken the {items[room]}')
-                player1.items.append(''.join(items[room]))
-                player1.item = items.pop(room)
+                player.items.append(''.join(items[room]))
+                player.item = items.pop(room)
                 time.sleep(1.5)
             except Exception:
                 clear()
@@ -317,7 +318,7 @@ def search_room(room):
 # defines function to show current items in inventory.
 def show_items():
     clear()
-    print(f'Current items are: {" and ".join(player1.items)}.')
+    print(f'Current items are: {" and ".join(player.items)}.')
     time.sleep(3)
 
 
@@ -329,15 +330,15 @@ def possible_actions():
         print("Type 's' to search, 'c' to craft, 'i' to see items,", end=" ")
         action = input("'u' to use items.\n'Q' to quit.\n").lower()
         if action == 's' or action == 'search':
-            search_room(player1.current_room)
+            search_room(player.current_room)
         elif action == 'c' or action == 'craft':
             craft()
         elif action == 'i' or action == 'items':
-            if player1.items == []:
+            if player.items == []:
                 clear()
                 print('You currently have no items.')
                 time.system(1.5)
-            elif player1.items != []:
+            elif player.items != []:
                 show_items()
         elif action == 'u' or action == 'use':
             use_item()
@@ -384,7 +385,9 @@ def goto(room, dir):
         time.sleep(2)
         return
     try:
-        changeRoom(room, move)
+        player.map = player.map[:map_code[player.current_room]] + ' ' + player.map[map_code[player.current_room]+1:]
+        player.current_room = rooms[room][move]  # changes current room.
+        player.map = player.map[:map_code[player.current_room]] + '*' + player.map[map_code[player.current_room]+1:]
         clear()
         print('You have moved to the', move + '.')
         time.sleep(2)
@@ -394,15 +397,19 @@ def goto(room, dir):
         print(Exception)
         time.sleep(2)
 
+'''
+come back to this --VV
+
 def changeRoom(room, move):
-    player1.map = player1.map[:map_code[player1.current_room]] + ' ' + player1.map[map_code[player1.current_room]+1:]
-    player1.current_room = rooms[room][move]  # changes current room.
-    player1.map = player1.map[:map_code[player1.current_room]] + '*' + player1.map[map_code[player1.current_room]+1:]
-    
+    player.map = player.map[:map_code[player.current_room]] + ' ' + player.map[map_code[player.current_room]+1:]
+    player.current_room = rooms[room][move]  # changes current room.
+    player.map = player.map[:map_code[player.current_room]] + '*' + player.map[map_code[player.current_room]+1:]
+^^^
+'''    
 # allows player to see instructions whenever needed.
 def instr():
     clear()
-    print(f'\n{room_desc[player1.current_room]}')
+    print(f'\n{room_desc[player.current_room]}')
     print('You need to find the exit, but watch out for you\'re captors!')
     print('Make sure to search the rooms and craft items!')
     time.sleep(5)
@@ -411,14 +418,14 @@ def instr():
 # function to check if player in an enemy room and initiates fight sequence.
 def if_fight():
     while True:
-        if player1.current_room == guard.current_room:
-            print(f'{room_desc[player1.current_room]}')
+        if player.current_room == guard.current_room:
+            print(f'{room_desc[player.current_room]}')
             choice1 = input('Do you wish to fight the theif? (y/n)\n')
             if choice1 == 'y':
-                fight(player1, guard, player1)
+                fight(player, guard, player)
             elif choice1 == 'n':
                 print('the thief notices you and attacks!')
-                fight(player1, guard, guard)
+                fight(player, guard, guard)
             else:
                 clear()
                 print('Invalid choice.')
@@ -426,14 +433,14 @@ def if_fight():
                 clear()
                 continue
 
-        elif player1.current_room == villan.current_room:
-            print(f'{room_desc[player1.current_room]}')
+        elif player.current_room == villan.current_room:
+            print(f'{room_desc[player.current_room]}')
             choice2 = input('Do you wish to fight The theif leader? (y/n)\n')
             if choice2 == 'y':
-                fight(player1, villan, player1)
+                fight(player, villan, player)
             elif choice2 == 'n':
                 print('The theif leader attacks!')
-                fight(player1, villan, villan)
+                fight(player, villan, villan)
             else:
                 clear()
                 print('Invalid choice.')
@@ -446,45 +453,42 @@ def if_fight():
 
 def main():
     clear()
-    while True:
-        if player1.hp <= 0 or villan.hp <= 0:
-            return
-        else:
-            clear()
-            if_fight()
-            print(player1.map)
-            status()
-            print(f'\n{possible_movement(player1.current_room)}.\n')
-            print('Command prefixes: ')
-            print("'goto (n, s, e or w)' to navigate rooms,\n'search'\
-    to search room,")
+    while player.hp > 0 and villan.hp > 0:
+        clear()
+        if_fight()
+        print(player.map)
+        status()
+        print(f'\n{possible_movement(player.current_room)}.\n')
+        print('Command prefixes: ')
+        print("'goto (n, s, e or w)' to navigate rooms,\n'search' \
+to search room,")
 
-            print("'craft' to craft,\n'use' to use items,")
-            print("'items' to show items,")
-            print("'help' for help.\n")
-            choice = input('Enter move: ').lower()
-            choice = choice.split(' ')
-            try:
-                if choice[0][0] == 'g':
-                    goto(player1.current_room, choice[1][0])
-                elif choice[0][0] == 's':
-                    search_room(player1.current_room)
-                elif choice[0][0] == 'c':
-                    craft()
-                elif choice[0][0] == 'u':
-                    use_item()
-                elif choice[0][0] == 'i':
-                    show_items()
-                elif choice[0][0] == 'h':
-                    instr()
-            except Exception:
-                clear()
-                print('Invalid command.')
-                time.sleep(1.5)
+        print("'craft' to craft,\n'use' to use items,")
+        print("'items' to show items,")
+        print("'help' for help.\n")
+        choice = input('Enter move: ').lower()
+        choice = choice.split(' ')
+        try:
+            if choice[0][0] == 'g':
+                goto(player.current_room, choice[1][0])
+            elif choice[0][0] == 's':
+                search_room(player.current_room)
+            elif choice[0][0] == 'c':
+                craft()
+            elif choice[0][0] == 'u':
+                use_item()
+            elif choice[0][0] == 'i':
+                show_items()
+            elif choice[0][0] == 'h':
+                instr()
+        except Exception:
+            clear()
+            print('Invalid command.')
+            time.sleep(1.5)
 
 
 def winning_sequence():
-    if player1.hp > 0 and villan.hp <= 0:
+    if player.hp > 0 and villan.hp <= 0:
         clear()
         print('You have escaped your inevitable demise!')
         print('Do you wish to save the other hostage?')
@@ -501,7 +505,7 @@ def winning_sequence():
         print('Game over! Congrats!')
         time.sleep(3)
         clear()
-    elif player1.hp <= 0:
+    elif player.hp <= 0:
         clear()
         print('You have DIED!')
         time.sleep(3)
@@ -511,7 +515,7 @@ def winning_sequence():
 # function containing main loop.
 if __name__ == '__main__':
     instr()
-    while villan.hp > 0 and player1.hp > 0:
+    while villan.hp > 0 and player.hp > 0:
         clear()
         main()
     winning_sequence()
