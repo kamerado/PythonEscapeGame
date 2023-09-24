@@ -32,9 +32,7 @@ map_code = {
     'Bathroom': 134,
     'Boiler Room': 198,
     'Closet Room': 205,
-    'Living Room': 212
-    }
-
+    'Living Room': 212}
 
 # define room descriptions.
 room_desc = {
@@ -61,7 +59,7 @@ rooms = {
     'Living Room': {'west': 'Closet Room', 'north': 'Bathroom'},
     'Bathroom': {'north': 'Hallway', 'south': 'Living room'},
     'Hallway': {'south': 'Dining Room', 'north': 'Escape!'},
-    'Escape!': 'free man!', }
+    'Escape!': 'free man!'}
 
 # define items and coresponding rooms.
 items = {
@@ -71,8 +69,7 @@ items = {
     'Boiler Room': 'pipe',
     'Closet Room': 'healing potion',
     'Living Room': 'steel file',
-    'Bathroom': 'resistance potion', }
-
+    'Bathroom': 'resistance potion'}
 
 # Creates classes for the player and enemy.
 class players():
@@ -88,12 +85,11 @@ class players():
             self.d_mult = 1
             self.current_room = 'Dark Room'
             self.items = []
-            self.weapon = None
             self.map = map
 
         # defines function repsponsible for applying damage to player.
         def takedamage(self, damage, enemy):
-            self.hp -= damage - self.d_resistance
+            self.hp -= damage - ((self.d_resistance / 100) * damage)
             clear()
             print(enemy.name, 'attacks for:', damage, "dp.")
 
@@ -101,7 +97,6 @@ class players():
         def calcdam(self):
             dmg = random.randint(self.d_min, self.d_max) * self.d_mult
             return dmg
-
 
     # defines enemy character stats.
     class enemy():
@@ -122,7 +117,6 @@ class players():
         def calcdam(self):
             dmg = random.randint(self.d_min, self.d_max)
             return dmg
-
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
 villan = players.enemy('The badman', 250, 20, 40, 'Hallway')
@@ -152,11 +146,6 @@ def status():
         print('Current items are:', str(player.items) + '.')
     elif player.items is None:
         print('You currently have no items.')
-    if player.weapon is False:
-        print('You have no weapon.')
-    elif player.weapon == 'sharpened pipe':
-        print('You have a sharpeded pipe.')
-
 
 # defines a function to handle attack sequences.
 def attack(attacker, attacking, enemy):
@@ -167,14 +156,11 @@ def attack(attacker, attacking, enemy):
         attacking.takedamage(attacker.calcdam(), attacker)
         time.sleep(2)
 
-
 # defines a function that allows the player to use an item.
 def use_item():
     clear()
     # enumerates through player.items, shows enumerating number next to each item making it easier to select an item.
     text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(player.items, start=1))
-    
-    
     if 'healing potion' in player.items or 'resistance potion' in player.items or 'magic stone' in player.items:
         print('Select an item to use: (1, 2 , 3 etc).')
         use = input(f'Type \'exit\' to exit menu \n{text}\n')
@@ -212,7 +198,6 @@ def use_item():
 
         print('You have no items to use.')
         time.sleep(2)
-
 
 # defines function for player and enemy to fight until either wins.
 def fight(hero, enemy, first_move):
@@ -254,7 +239,6 @@ def fight(hero, enemy, first_move):
         time.sleep(2)
         clear()
 
-
 # defines the function to craft the weapon needed to beat the main villan.
 def craft():
     if 'pipe' in player.items and 'steel file' in player.items\
@@ -288,7 +272,6 @@ def craft():
         print('There are no items available to craft. Collect more supplies.')
         time.sleep(2)
 
-
 # defines function for searching the rooms, and obtaining items.
 def search_room(room):
     clear()
@@ -314,13 +297,11 @@ def search_room(room):
         print('There are no items in this room.')
         time.sleep(1.5)
 
-
 # defines function to show current items in inventory.
 def show_items():
     clear()
     print(f'Current items are: {" and ".join(player.items)}.')
     time.sleep(3)
-
 
 # defines function to show possible actions
 def possible_actions():
@@ -349,7 +330,6 @@ def possible_actions():
             print('Invalid input.')
             time.sleep(1.5)
             continue
-
 
 # defines function that shows the direction of conqurent rooms.
 def possible_movement(room):
@@ -396,16 +376,7 @@ def goto(room, dir):
         print('You walked into the wall.')
         print(Exception)
         time.sleep(2)
-
-'''
-come back to this --VV
-
-def changeRoom(room, move):
-    player.map = player.map[:map_code[player.current_room]] + ' ' + player.map[map_code[player.current_room]+1:]
-    player.current_room = rooms[room][move]  # changes current room.
-    player.map = player.map[:map_code[player.current_room]] + '*' + player.map[map_code[player.current_room]+1:]
-^^^
-'''    
+        
 # allows player to see instructions whenever needed.
 def instr():
     clear()
@@ -413,7 +384,6 @@ def instr():
     print('You need to find the exit, but watch out for you\'re captors!')
     print('Make sure to search the rooms and craft items!')
     time.sleep(5)
-
 
 # function to check if player in an enemy room and initiates fight sequence.
 def if_fight():
@@ -450,7 +420,6 @@ def if_fight():
         else:
             return None
 
-
 def main():
     clear()
     while player.hp > 0 and villan.hp > 0:
@@ -460,9 +429,7 @@ def main():
         status()
         print(f'\n{possible_movement(player.current_room)}.\n')
         print('Command prefixes: ')
-        print("'goto (n, s, e or w)' to navigate rooms,\n'search' \
-to search room,")
-
+        print("'goto (n, s, e or w)' to navigate rooms,\n'search' to search room,")
         print("'craft' to craft,\n'use' to use items,")
         print("'items' to show items,")
         print("'help' for help.\n")
@@ -486,8 +453,8 @@ to search room,")
             print('Invalid command.')
             time.sleep(1.5)
 
-
-def winning_sequence():
+# sequence that happens when you win or lose.
+def ending_sequence():
     if player.hp > 0 and villan.hp <= 0:
         clear()
         print('You have escaped your inevitable demise!')
@@ -511,11 +478,10 @@ def winning_sequence():
         time.sleep(3)
         clear()
 
-
 # function containing main loop.
 if __name__ == '__main__':
     instr()
     while villan.hp > 0 and player.hp > 0:
         clear()
         main()
-    winning_sequence()
+    ending_sequence()
