@@ -10,26 +10,32 @@ def clear():
 # updated game data.
 # \ used to continue lines where strings are too long.
 map = '''
-Map
 start         exit
 -----         -----
-| * |         | * |
+| * |         |   |
 -----         -----
   |             |
 -----  -----  -----
-| * |--| * |  | * |
+|   |--|   |  |   |
 -----  -----  -----
   |      |      |
 -----  -----  -----
-| * |  | * |--| * |
+|   |  |   |--|   |
 -----  -----  -----
 '''
-for i in map:
-    if i == '*':
-        index = map.index(i)
-        print(index)
-        map = map[:index] + ' ' + map[index+1:]
-time.sleep(5)
+# map codes are the indexes of where '*' appear on map, indicating the room you're in relative to the other rooms.
+map_code = {
+    'Dark Room': 42,
+    'Hallway': 56,
+    'Party Room': 120,
+    'Dining Room': 127,
+    'Bathroom': 134,
+    'Boiler Room': 198,
+    'Closet Room': 205,
+    'Living Room': 212
+    }
+
+
 # define room descriptions.
 room_desc = {
     'Dark Room': 'You are in a dark room with loud tunes.',
@@ -39,7 +45,7 @@ room_desc = {
 He looks angry.',
 
     'Closet Room': 'You find a room containing shelfs.',
-    'Basement': 'You wander down into the basement, there are many storage \
+    'Living Room': 'You wander down into the Living Room, there are many storage \
 boxes.',
 
     'Bathroom': 'You walk into a bathroom, it smells like someone died in \
@@ -51,16 +57,12 @@ here.',
 # define room layout.
 rooms = {
     'Dark Room': {'south': 'Party Room'},
-    'Party Room': {'south': 'Boiler Room', 'east': 'Dining Room',
-                            'north': 'Dark Room'},
-
+    'Party Room': {'south': 'Boiler Room', 'east': 'Dining Room', 'north': 'Dark Room'},
     'Boiler Room': {'north': 'Party Room'},
-    'Dining Room': {'south': 'Closet Room', 'east': 'Bathroom',
-                    'north': 'Hallway', 'west': 'Party Room'},
-
-    'Closet Room': {'east': 'Basement', 'north': 'Dining Room'},
-    'Basement': {'west': 'Closet Room'},
-    'Bathroom': {'west': 'Dining Room'},
+    'Dining Room': {'south': 'Closet Room', 'west': 'Party Room'},
+    'Closet Room': {'east': 'Living Room', 'north': 'Dining Room'},
+    'Living Room': {'west': 'Closet Room', 'north': 'Bathroom'},
+    'Bathroom': {'north': 'Hallway', 'south': 'Living room'},
     'Hallway': {'south': 'Dining Room', 'north': 'Escape!'},
     'Escape!': 'free man!', }
 
@@ -70,13 +72,8 @@ items = {
     'Party Room': 'duck tape',
     'Boiler Room': 'pipe',
     'Closet Room': 'healing potion',
-    'Basement': 'steel file',
+    'Living Room': 'steel file',
     'Bathroom': 'resistance potion', }
-
-# define enemys and their location.
-enemy = {
-        'Hallway': 'Thief Leader',
-        'Dining Room': 'Thief', }
 
 
 # Creates classes for the player and enemy.
@@ -94,6 +91,7 @@ class players():
             self.current_room = 'Dark Room'
             self.items = []
             self.weapon = None
+            self.map = map
 
         # defines function repsponsible for applying damage to player.
         def takedamage(self, damage, enemy):
@@ -106,9 +104,6 @@ class players():
             dmg = random.randint(self.d_min, self.d_max) * self.d_mult
             return dmg
 
-        # defines function for using items.
-        def useitem(self):
-            pass
 
     # defines enemy character stats.
     class enemy():
@@ -131,8 +126,8 @@ class players():
             return dmg
 
 
-# creates enemy objects.
-villan = players.enemy('The badman', 200, 20, 40, 'Hallway')
+# creates enemy objects and sets hp and minimum/maximum attack damage.
+villan = players.enemy('The badman', 250, 20, 40, 'Hallway')
 guard = players.enemy('Dumb Henchman', 50, 0, 15, 'Dining Room')
 
 # small introduction to the game, allows you to give yourself a name,
@@ -151,7 +146,6 @@ while action != 'e':  # using while loop to make sure program won't crash.
 clear()
 print('\nDon\'t try to escape! They will torture you!')
 time.sleep(2)
-
 
 # defines a function to show current room, hp, inventory, and weapon.
 def status():
@@ -172,7 +166,6 @@ def attack(attacker, attacking, enemy):
     if attacker == player1:
         attacking.takedamage(attacker.calcdam(), attacking)
         time.sleep(2)
-
     elif attacker == enemy:
         attacking.takedamage(attacker.calcdam(), attacker)
         time.sleep(2)
@@ -183,7 +176,7 @@ def use_item():
     clear()
     text = "\n".join("> [{}] {}".format(n, i) for n, i in
                      enumerate(player1.items, start=1))
-
+    
     if 'healing potion' in player1.items or 'resistance potion'\
             in player1.items:
         print('Select an item to use: (1, 2 , 3 etc).')
@@ -385,17 +378,27 @@ def goto(room, dir):
             time.sleep(1.5)
             clear()
             return None
+    # this if statement makes sure that the movement direction is possible before erasing current position in map.
+    if move not in rooms[room]:
+        print('You have walked into a wall.')
+        time.sleep(2)
+        return
     try:
-        player1.current_room = rooms[room][move]  # changes current room.
+        changeRoom(room, move)
         clear()
         print('You have moved to the', move + '.')
         time.sleep(2)
     except Exception:
         clear()
         print('You walked into the wall.')
+        print(Exception)
         time.sleep(2)
 
-
+def changeRoom(room, move):
+    player1.map = player1.map[:map_code[player1.current_room]] + ' ' + player1.map[map_code[player1.current_room]+1:]
+    player1.current_room = rooms[room][move]  # changes current room.
+    player1.map = player1.map[:map_code[player1.current_room]] + '*' + player1.map[map_code[player1.current_room]+1:]
+    
 # allows player to see instructions whenever needed.
 def instr():
     clear()
@@ -445,10 +448,11 @@ def main():
     clear()
     while True:
         if player1.hp <= 0 or villan.hp <= 0:
-            break
+            return
         else:
             clear()
             if_fight()
+            print(player1.map)
             status()
             print(f'\n{possible_movement(player1.current_room)}.\n')
             print('Command prefixes: ')
@@ -462,7 +466,7 @@ def main():
             choice = choice.split(' ')
             try:
                 if choice[0][0] == 'g':
-                    goto(player1.current_room, choice[1])
+                    goto(player1.current_room, choice[1][0])
                 elif choice[0][0] == 's':
                     search_room(player1.current_room)
                 elif choice[0][0] == 'c':
@@ -480,7 +484,7 @@ def main():
 
 
 def winning_sequence():
-    if player1.hp > 0 and player1.current_room == 'Escape!':
+    if player1.hp > 0 and villan.hp <= 0:
         clear()
         print('You have escaped your inevitable demise!')
         print('Do you wish to save the other hostage?')
@@ -507,7 +511,7 @@ def winning_sequence():
 # function containing main loop.
 if __name__ == '__main__':
     instr()
-    while player1.current_room != 'Escape!' and player1.hp > 0:
+    while villan.hp > 0 and player1.hp > 0:
         clear()
         main()
     winning_sequence()
