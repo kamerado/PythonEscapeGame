@@ -1,14 +1,13 @@
-import random
-import time
+import random  # using random to calculate random integers for attack damage.
+import time  # using time to make the script sleep for a specified amount of seconds.
 
-
+'''
+using time and clear() to clear terminal and make script sleep breifly to
+make the script easier to follow, allowing the screen to show only updated game data.'''
 def clear():
     print("\x1B[2J")
-# using random to calculate random integers for attack damage.
-# using time and clear() to clear terminal and make script sleep breifly to
-# make the script easier to follow, allowing the screen to show only
-# updated game data.
-# \ used to continue lines where strings are too long.
+
+# uses this map to visuale current player room for user.
 map = '''
 start         exit
 -----         -----
@@ -23,7 +22,8 @@ start         exit
 |   |  |   |--|   |
 -----  -----  -----
 '''
-# map codes are the indexes of where '*' appear on map, indicating the room you're in relative to the other rooms.
+
+# map codes are the indexes of where the '*' appear on map, indicating the room you're in relative to the other rooms.
 map_code = {
     'Dark Room': 42,
     'Hallway': 56,
@@ -46,8 +46,7 @@ room_desc = {
 
     'Bathroom': 'You walk into a bathroom, it smells like someone died in here.',
 
-    'Hallway': 'You find the front hallway, but see an angry, huge man.',
-    'Escape!': 'You are outside.'}
+    'Hallway': 'You find the front hallway, but see an angry, huge man.'}
 
 # define room layout.
 rooms = {
@@ -58,8 +57,7 @@ rooms = {
     'Closet Room': {'east': 'Living Room', 'north': 'Dining Room'},
     'Living Room': {'west': 'Closet Room', 'north': 'Bathroom'},
     'Bathroom': {'north': 'Hallway', 'south': 'Living room'},
-    'Hallway': {'south': 'Dining Room', 'north': 'Escape!'},
-    'Escape!': 'free man!'}
+    'Hallway': {'south': 'Dining Room'}}
 
 # define items and coresponding rooms.
 items = {
@@ -77,34 +75,34 @@ class players():
         # defines player stats.
         def __init__(self, name):
             self.name = name
-            self.d_resistance = 0
+            self.resistance = 0
             self.hp = 100
             self.max_hp = 150
-            self.d_min = 15
-            self.d_max = 30
-            self.d_mult = 1
+            self.min_damage = 15
+            self.max_damage = 30
+            self.damage_mult = 1
             self.current_room = 'Dark Room'
             self.items = []
             self.map = map
 
         # defines function repsponsible for applying damage to player.
         def takedamage(self, damage, enemy):
-            self.hp -= damage - ((self.d_resistance / 100) * damage)
+            self.hp -= damage - ((self.resistance / 100) * damage)
             clear()
             print(enemy.name, 'attacks for:', damage, "dp.")
 
-        # defines function to calculate how much damage is delt.
+        # defines function to calculate how much damage the player deals.
         def calcdam(self):
-            dmg = random.randint(self.d_min, self.d_max) * self.d_mult
+            dmg = random.randint(self.min_damage, self.max_damage) * self.damage_mult
             return dmg
 
     # defines enemy character stats.
     class enemy():
-        def __init__(self, name, hp, d_min, d_max, current_room):
+        def __init__(self, name, hp, min_damage, max_damage, current_room):
             self.name = name
             self.hp = hp
-            self.d_min = d_min
-            self.d_max = d_max
+            self.min_damage = min_damage
+            self.max_damage = max_damage
             self.current_room = current_room
 
         # defines function for enemy damage delt.
@@ -115,7 +113,7 @@ class players():
 
         # defines function to calculate damage of enemy attacks.
         def calcdam(self):
-            dmg = random.randint(self.d_min, self.d_max)
+            dmg = random.randint(self.min_damage, self.max_damage)
             return dmg
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
@@ -175,7 +173,7 @@ def use_item():
                 time.sleep(2)
             elif player.items[int(use) - 1] == 'resistance potion':
                 player.items.remove(player.items[int(use) - 1])
-                player.d_resistance += 15
+                player.resistance += 15
                 clear()
                 print('-1 Resistance Potion')
                 print('+15 damage resistance.')
@@ -247,7 +245,7 @@ def craft():
         print('You can craft a sharpened pipe.')
         action = input('Do you wish to craft a sharpened pipe? (y/n)\n')
         if action == 'y':
-            player.d_mult = 2
+            player.damage_mult = 2
             player.items.remove('pipe')
             player.items.remove('cloth')
             
@@ -259,7 +257,7 @@ def craft():
             print('You might want to craft this item...')
             choice = input('Do you wish to craft item anyway? (y/n)\n')
             if choice == 'y':
-                player.d_mult = 2
+                player.damage_mult = 2
                 player.items.pop('pipe')
                 clear()
         else:
@@ -283,7 +281,7 @@ def search_room(room):
                 clear()
                 if items[room] == 'magic stone':
                     print(f'+ 10% resistance.')
-                    player.d_resistance += 10
+                    player.resistance += 10
                 print(f'You have taken the {items[room]}')
                 player.items.append(''.join(items[room]))
                 player.item = items.pop(room)
