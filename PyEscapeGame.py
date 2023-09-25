@@ -23,7 +23,7 @@ start         exit
 -----  -----  -----
 '''
 
-# map codes are the indexes of where the '*' appear on map, indicating the room you're in relative to the other rooms.
+# map codes are the indexes of where the "*" would appear in different rooms on the map. "*" Indicates the room you're in relative to the other rooms.
 map_code = {
     'Dark Room': 42,
     'Hallway': 56,
@@ -48,7 +48,7 @@ room_desc = {
 
     'Hallway': 'You find the front hallway, but see an angry, huge man.'}
 
-# define room layout.
+# defines room layout.
 rooms = {
     'Dark Room': {'south': 'Party Room'},
     'Party Room': {'south': 'Boiler Room', 'east': 'Dining Room', 'north': 'Dark Room'},
