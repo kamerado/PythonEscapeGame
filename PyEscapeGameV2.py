@@ -1,9 +1,8 @@
 import random  # using random to calculate random integers for attack damage.
 import time  # using time to make the script sleep for a specified amount of seconds.
 
-'''
-using time and clear() to clear terminal and make script sleep breifly to
-make the script easier to follow, allowing the screen to show only updated game data.'''
+# using time and clear() to clear terminal and make script sleep breifly to
+# allow the script to be easier to follow. this makes the screen show only updated game data.
 def clear():
     print("\x1B[2J")
 
@@ -23,51 +22,48 @@ start         exit
 -----  -----  -----
 '''
 
-# map codes are the indexes of where the "*" would appear in different rooms on the map. "*" Indicates the room you're in relative to the other rooms.
+# uses "map_code" to slice at specified indexes of string map for each room.
+# "*" = current room on the map. 
 map_code = {
-    'Dark Room': 42,
+    'Cell': 42,
     'Hallway': 56,
-    'Party Room': 120,
+    'Study': 120,
     'Dining Room': 127,
-    'Bathroom': 134,
-    'Boiler Room': 198,
-    'Closet Room': 205,
-    'Living Room': 212}
+    'Armory': 134,
+    'Torture Room': 198,
+    'Storage Room': 205,
+    'Living Quarters': 212}
 
 # define room descriptions.
 room_desc = {
-    'Dark Room': 'You are in a dark room with loud tunes.',
-    'Party Room': 'You are in a what looks like a party room.',
-    'Boiler Room': 'You are in a small boiler room, you see some loose pipe.',
-    'Dining Room': 'You find an angry looking man eating at a table. He looks angry.',
-
-    'Closet Room': 'You find a room containing shelfs.',
-    'Living Room': 'You wander down into the Living Room, there are many storage boxes.',
-
-    'Bathroom': 'You walk into a bathroom, it smells like someone died in here.',
-
+    'Cell': 'You are in a dark cell.',
+    'Study': 'You are in a what looks like a Study.',
+    'Torture Room': 'You are in a small torture room, you see some loose scrap metal.',
+    'Dining Room': 'You find an angry looking man eating at a table.',
+    'Storage Room': 'You find a room containing shelfs.',
+    'Living Quarters': 'You wander down into the Living Quarters, there are many storage boxes.',
+    'Armory': 'You walk into a Armory, it smells like someone died in here.',
     'Hallway': 'You find the front hallway, but see an angry, huge man.'}
 
 # defines room layout.
 rooms = {
-    'Dark Room': {'south': 'Party Room'},
-    'Party Room': {'south': 'Boiler Room', 'east': 'Dining Room', 'north': 'Dark Room'},
-    'Boiler Room': {'north': 'Party Room'},
-    'Dining Room': {'south': 'Closet Room', 'west': 'Party Room'},
-    'Closet Room': {'east': 'Living Room', 'north': 'Dining Room'},
-    'Living Room': {'west': 'Closet Room', 'north': 'Bathroom'},
-    'Bathroom': {'north': 'Hallway', 'south': 'Living room'},
+    'Cell': {'south': 'Study'},
+    'Study': {'south': 'Torture Room', 'east': 'Dining Room', 'north': 'Cell'},
+    'Torture Room': {'north': 'Study'},
+    'Dining Room': {'south': 'Storage Room', 'west': 'Study'},
+    'Storage Room': {'east': 'Living Quarters', 'north': 'Dining Room'},
+    'Living Quarters': {'west': 'Storage Room', 'north': 'Armory'},
+    'Armory': {'north': 'Hallway', 'south': 'Living Quarters'},
     'Hallway': {'south': 'Dining Room'}}
 
 # define items and coresponding rooms.
 items = {
-    'Dark Room': 'healing potion',
-    'Dining Room': 'magic stone',
-    'Party Room': 'cloth',
-    'Boiler Room': 'pipe',
-    'Closet Room': 'healing potion',
-    'Living Room': 'steel file',
-    'Bathroom': 'resistance potion'}
+    'Dining Room': 'magic necklace',
+    'Study': 'cloth',
+    'Torture Room': 'iron',
+    'Storage Room': 'healing potion',
+    'Living Quarters': 'steel file',
+    'Armory': 'resistance potion'}
 
 # Creates classes for the player and enemy objects.
 class players():
@@ -81,13 +77,13 @@ class players():
             self.min_damage = 15
             self.max_damage = 30
             self.damage_mult = 1
-            self.current_room = 'Dark Room'
+            self.current_room = 'Cell'
             self.items = []
             self.map = map
 
         # defines function repsponsible for applying damage to player.
         def takedamage(self, damage, enemy):
-            self.hp -= int(damage) - int(((self.resistance / 100)) * int(damage))
+            self.hp -= damage - ((self.resistance / 100) * damage)
             print(enemy.name, 'attacks for:', damage, "dp.")
 
         # defines function to calculate how much damage the player deals.
@@ -125,14 +121,14 @@ guard = players.enemy('Dumb Henchman', 50, 0, 15, 'Dining Room')
 # small introduction into the game, allows you to give yourself a name,
 clear()
 print('\nRandom man: Finally you\'re awake! Whats your name?')
-playername = input('Enter username: ') # allowing user to input a username. You could use this to make a leaderboard.
+playername = input('Enter username: ') # allowing user to input a username.
 player = players.hero(playername) # initialize player object.
 clear()
 print('\nWell...', player.name + '...\nWe\'ve been captured by the a group')
 print('of raiders who plan to hold us for randsom...')
 action = ''
 while action != 'e':  # using while loop to make sure program won't crash.
-    text = 'Press e to break zipties: '
+    text = 'Press e to break chains on rocks: '
     action = input("\x1B[3m" + text + "\x1B[0m")
 clear()
 print('\nDon\'t try to escape! They will torture you!')
@@ -163,7 +159,7 @@ def use_item():
     clear()
     # enumerates through player.items, shows enumerating number next to each item making it easier to select an item.
     text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(player.items, start=1))
-    if 'healing potion' in player.items or 'resistance potion' in player.items or 'magic stone' in player.items:
+    if 'healing potion' in player.items or 'resistance potion' in player.items or 'magic necklace' in player.items:
         print('Select an item to use: (1, 2 , 3 etc).')
         use = input(f'Type \'exit\' to exit menu \n{text}\n')
         if use == 'e' or use == 'exit':
@@ -182,7 +178,7 @@ def use_item():
                 print('-1 Resistance Potion')
                 print('+15 damage resistance.')
                 time.sleep(2)
-            elif player.items[int(use) - 1] == 'pipe'\
+            elif player.items[int(use) - 1] == 'iron'\
                     or player.items[int(use) - 1] == 'steel file':
 
                 clear()
@@ -229,7 +225,6 @@ def fight(hero, enemy, first_move):
         elif turn == enemy:
             attack(enemy, hero, enemy)
             turn = hero
-            
     if hero.hp < 0:
         clear()
         print('You died!')
@@ -244,18 +239,18 @@ def fight(hero, enemy, first_move):
 
 # defines the function to craft the weapon needed to beat the main villan.
 def craft():
-    if 'pipe' in player.items and 'steel file' in player.items\
+    if 'iron' in player.items and 'steel file' in player.items\
             and 'cloth' in player.items:
         clear()
-        print('You can craft a sharpened pipe.')
-        action = input('Do you wish to craft a sharpened pipe? (y/n)\n')
+        print('You can craft a sharpened iron.')
+        action = input('Do you wish to craft a sharpened iron? (y/n)\n')
         if action == 'y':
             player.damage_mult = 2
-            player.items.remove('pipe')
+            player.items.remove('iron')
             player.items.remove('cloth')
             
             clear()
-            print('You have crafted a sharpened pipe.')
+            print('You have crafted a sharpened iron.')
             time.sleep(2)
         elif action == 'n':
             clear()
@@ -263,7 +258,7 @@ def craft():
             choice = input('Do you wish to craft item anyway? (y/n)\n')
             if choice == 'y':
                 player.damage_mult = 2
-                player.items.pop('pipe')
+                player.items.pop('iron')
                 clear()
         else:
             clear()
@@ -284,7 +279,7 @@ def search_room(room):
         if choice == 'y':
             try:
                 clear()
-                if items[room] == 'magic stone':
+                if items[room] == 'magic necklace':
                     print(f'+ 10% resistance.')
                     player.resistance += 10
                 print(f'You have taken the {items[room]}')
