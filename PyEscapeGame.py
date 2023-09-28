@@ -83,7 +83,7 @@ class players():
 
         # defines function repsponsible for applying damage to player.
         def takedamage(self, damage, enemy):
-            self.hp -= damage - ((self.resistance / 100) * damage)
+            self.hp -= int(damage - ((self.resistance / 100) * damage))
             print(enemy.name, 'attacks for:', damage, "dp.")
 
         # defines function to calculate how much damage the player deals.
@@ -230,12 +230,16 @@ def fight(hero, enemy, first_move):
         print('You died!')
         print('Hint: craft a sharper weapon than your fists.')
         time.sleep(2.3)
+        return player
     elif enemy.hp < 0:
         clear()
         enemy.current_room = 'dead'
         print(f'You have defeated {enemy.name}!')
         time.sleep(2)
         clear()
+        if enemy == villan:
+            return villan
+        
 
 # defines the function to craft the weapon needed to beat the main villan.
 def craft():
@@ -280,8 +284,8 @@ def search_room(room):
             try:
                 clear()
                 if items[room] == 'magic necklace':
-                    print(f'+ 10% resistance.')
-                    player.resistance += 10
+                    print(f'+ 15% resistance.')
+                    player.resistance += 15
                 print(f'You have taken the {items[room]}')
                 player.items.append(''.join(items[room]))
                 player.item = items.pop(room)
@@ -400,29 +404,37 @@ def if_fight():
                 time.sleep(1.5)
                 clear()
                 continue
+            return None
 
         elif player.current_room == villan.current_room:
             print(f'{room_desc[player.current_room]}')
             choice2 = input('Do you wish to fight The theif leader? (y/n)\n')
             if choice2 == 'y':
-                fight(player, villan, player)
+                loser = fight(player, villan, player)
             elif choice2 == 'n':
                 print('The theif leader attacks!')
-                fight(player, villan, villan)
+                loser = fight(player, villan, villan)
             else:
                 clear()
                 print('Invalid choice.')
                 time.sleep('1.5')
                 clear()
                 continue
+            if loser == player:
+                return 'lose'
+            elif loser == villan:
+                return 'win'
         else:
             return None
 
 def main():
     clear()
-    while player.hp > 0 and villan.hp > 0:
+    while player.hp > 0 and villan.current_room == 'Hallway':
         clear()
-        if_fight()
+        result = if_fight()
+        print(result)
+        if result != None:  # check for game ending scenareo.
+            return result
         print(player.map)
         status()
         print(f'\n{possible_movement(player.current_room)}.\n')
@@ -452,8 +464,8 @@ def main():
             time.sleep(1.5)
 
 # sequence that happens when you win or lose.
-def ending_sequence():
-    if player.hp > 0 and villan.hp <= 0:
+def ending_sequence(result):
+    if result == 'win':
         clear()
         print('You have escaped your inevitable demise!')
         print('Do you wish to save the other hostage?')
@@ -464,22 +476,40 @@ def ending_sequence():
             time.sleep(2)
         elif choice == 'n':
             clear()
-            print("You're evil for that lol.")
+            print("You lose karma.")
             time.sleep(2)
         clear()
-        print('Game over! Congrats!')
+        print(winner)
         time.sleep(3)
         clear()
-    elif player.hp <= 0:
+    elif result == 'lose':
         clear()
-        print('You have DIED!')
+        print(gameover)
         time.sleep(3)
         clear()
+winner = '''
+ _     _  ___   __    _  __    _  __    _  _______  ______    __  
+| | _ | ||   | |  |  | ||  |  | ||  |  | ||       ||    _ |  |  | 
+| || || ||   | |   |_| ||   |_| ||   |_| ||    ___||   | ||  |  | 
+|       ||   | |       ||       ||       ||   |___ |   |_||_ |  | 
+|       ||   | |  _    ||  _    ||  _    ||    ___||    __  ||__| 
+|   _   ||   | | | |   || | |   || | |   ||   |___ |   |  | | __  
+|__| |__||___| |_|  |__||_|  |__||_|  |__||_______||___|  |_||__| 
+'''
+gameover = '''
+ ___      _______  _______  _______  ______    __  
+|   |    |       ||       ||       ||    _ |  |  | 
+|   |    |   _   ||  _____||    ___||   | ||  |  | 
+|   |    |  | |  || |_____ |   |___ |   |_||_ |  | 
+|   |___ |  |_|  ||_____  ||    ___||    __  ||__| 
+|       ||       | _____| ||   |___ |   |  | | __  
+|_______||_______||_______||_______||___|  |_||__| 
+'''
 
 # function containing main loop.
 if __name__ == '__main__':
     instr()
     while villan.hp > 0 and player.hp > 0:
         clear()
-        main()
-    ending_sequence()
+        result = main()
+    ending_sequence(result)
