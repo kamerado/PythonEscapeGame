@@ -492,9 +492,9 @@ def if_fight():
 def main():
     clear()
     while player.hp > 0 and villan.current_room == 'Hallway':
+        result = if_fight()
         if result != None:  # check for game ending scenareo.
             return result
-        result = if_fight()
         clear()
         print(player.map)
         status()
