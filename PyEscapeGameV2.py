@@ -66,7 +66,7 @@ rooms = {
 #     'Armory': 'resistance potion'}
 class items():
     _registry = []
-    def __init__(self, name, hpAdd, resistAdd, damAdd, useable, location):
+    def __init__(self, name, hpAdd, resistAdd, damAdd, useable, location, **kwargs):
         self._registry.append(self)
         self.name = name
         self.hpAdd = hpAdd
@@ -74,6 +74,8 @@ class items():
         self.damAdd = damAdd
         self.useable = useable
         self.location = location
+        for i, x in kwargs.items():
+            self.effects = x
     def addItem(self, player):
         if self.useable == False:
             try:
@@ -96,11 +98,13 @@ class items():
             player.resistance += int(self.resistAdd)
             player.min_damage += int(self.damAdd)
             player.min_damage += int(self.damAdd)
-item1 = items('healing potion', 50, 0, 0, True, 'Storage Room')
+            print(f'You have used: {self.name}')
+            print(f'{self.effects}')
+item1 = items('healing potion', 50, 0, 0, True, 'Storage Room', effects='+50 HP.')
 item2 = items('magic necklace', 0, 15, 0, False, 'Dining Room')
 item3 = items('cloth', 0, 0, 0, False, 'Study')
 item4 = items('iron', 0, 0, 0, False, 'Torture Room')
-item1 = items('resistance potion', 0, 15, 0, True, 'Armory')
+item1 = items('resistance potion', 0, 15, 0, True, 'Armory', effects='+15 Resistance.')
 item1 = items('steel file', 0, 0, 0, False, 'Living Quarters')
 
 # Creates classes for the player and enemy objects.
@@ -199,46 +203,22 @@ def attack(attacker, attacking, enemy):
 def use_item():
     clear()
     # enumerates through player.items, shows enumerating number next to each item making it easier to select an item.
-    inventorys = []
+    item2 = []
+    keys = []
     for i in player.items2:
-        inventorys.append(i)
-        print(inventorys)
-    time.sleep(10)
-    text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(player.items, start=1))
-    if 'healing potion' in player.items2 or 'resistance potion' in player.items2 or 'magic necklace' in player.items2:
+        item2 = list(i.values())
+        keys = list(i.keys())
+    text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(item2, start=1))
+    if 'healing potion' in item2 or 'resistance potion' in item2:
         print('Select an item to use: (1, 2 , 3 etc).')
-        use = input(f'Type \'exit\' to exit menu \n{text}\n')
-        if use == 'e' or use == 'exit':
-            return
-        elif player.items[int(use) - 1] in player.items:
-            if player.items[int(use) - 1] == 'healing potion':
-                player.items.remove(player.items[int(use) - 1])
-                player.hp += 50
-                clear()
-                print('You gain 50 health.')
-                time.sleep(2)
-            elif player.items[int(use) - 1] == 'resistance potion':
-                player.items.remove(player.items[int(use) - 1])
-                player.resistance += 15
-                clear()
-                print('-1 Resistance Potion')
-                print('+15 damage resistance.')
-                time.sleep(2)
-            elif player.items[int(use) - 1] == 'iron'\
-                    or player.items[int(use) - 1] == 'steel file':
+        use = int(input(f'Type \'exit\' to exit menu \n{text}\n'))
+        item = keys[use-1]
+        print(item)
+        time.sleep(10)
+        item.useItem(player)
 
-                clear()
-                print('This item can only be used to craft another item.')
-                time.sleep(2)
-
-            else:
-                clear()
-                print('Invalid entree')
-                time.sleep(1.5)
-                use_item()
-
-    elif 'healing potion' not in player.items or 'resistance potion' not in\
-            player.items:
+    elif 'healing potion' not in item2keys or 'resistance potion' not in\
+            item2keys:
 
         print('You have no items to use.')
         time.sleep(2)
