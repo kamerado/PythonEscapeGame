@@ -56,14 +56,7 @@ rooms = {
     'Armory': {'north': 'Hallway', 'south': 'Living Quarters'},
     'Hallway': {'south': 'Dining Room'}}
 
-# define items and coresponding rooms.
-# items = {
-#     'Dining Room': 'magic necklace',
-#     'Study': 'cloth',
-#     'Torture Room': 'iron',
-#     'Storage Room': 'healing potion',
-#     'Living Quarters': 'steel file',
-#     'Armory': 'resistance potion'}
+# create item objects and assign them to indavidual rooms.
 class items():
     _registry = []
     def __init__(self, name, hpAdd, resistAdd, damAdd, useable, location, **kwargs):
@@ -78,17 +71,18 @@ class items():
             self.effects = x
     def addItem(self, player):
         if self.useable == False:
+            player.items1.append(self.name)
+            player.hp += int(self.hpAdd)
+            player.resistance += int(self.resistAdd)
+            player.min_damage += int(self.damAdd/2)
+            player.max_damage += int(self.damAdd)
+            self._registry.remove(self)
             try:
-                player.items1.append(self.name)
-                player.hp += int(self.hpAdd)
-                player.resistance += int(self.resistAdd)
-                player.min_damage += int(self.damAdd)
-                player.min_damage += int(self.damAdd)
-                self._registry.remove(self)
-                del self
-            except Exception:
-                print('WHAT THE FUCK')
-                time.sleep(1)
+                if self.effects != None:
+                    print(self.effects)
+            except Exception as error:
+                return
+            del self
         else:
             player.items2.append({self: self.name})
             self.location = player.items2
@@ -96,12 +90,13 @@ class items():
         if self.useable == True:
             player.hp += int(self.hpAdd)
             player.resistance += int(self.resistAdd)
-            player.min_damage += int(self.damAdd)
-            player.min_damage += int(self.damAdd)
+            player.min_damage += int(self.damAdd/2)
+            player.max_damage += int(self.damAdd)
             print(f'You have used: {self.name}')
             print(f'{self.effects}')
+# creates items and sets atributes and room location.
 item1 = items('healing potion', 50, 0, 0, True, 'Storage Room', effects='+50 HP.')
-item2 = items('magic necklace', 0, 15, 0, False, 'Dining Room')
+item2 = items('magic necklace', 0, 15, 0, False, 'Dining Room', effects=f'+15% resistance.')
 item3 = items('cloth', 0, 0, 0, False, 'Study')
 item4 = items('iron', 0, 0, 0, False, 'Torture Room')
 item1 = items('resistance potion', 0, 15, 0, True, 'Armory', effects='+15 Resistance.')
@@ -134,6 +129,28 @@ class players():
         def calcdam(self):
             dmg = random.randint(self.min_damage, self.max_damage) * self.damage_mult
             return dmg
+        
+        def useItem(self):
+                clear()
+                # enumerates through player.items, shows enumerating number next to each item making it easier to select an item.
+                print(self.items2)
+                out = []
+                keys = []
+                for i in self.items2:
+                    out += list(self.items2[self.items2.index(i)].values())
+                    keys += list(self.items2[self.items2.index(i)].keys())
+                text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(out, start=1))
+                if 'healing potion' in out or 'resistance potion' in out:
+                    print('Select an item to use: (1, 2 , 3 etc).')
+                    use = int(input(f'Type \'exit\' to exit menu \n{text}\n'))
+                    out = keys[use-1]
+                    out.useItem(self)
+                    self.items2[:] = [i for i in self.items2 if str(keys[use-1]) not in str(i.keys())]
+                elif 'healing potion' not in out or 'resistance potion' not in\
+                        out:
+                    print('You have no items to use.')
+                    time.sleep(2)
+
 
     # defines enemy character stats.
     class enemy():
@@ -199,30 +216,6 @@ def attack(attacker, attacking, enemy):
         attacking.takedamage(attacker.calcdam(), enemy)
         time.sleep(2)
 
-# defines a function that allows the player to use an item.
-def use_item():
-    clear()
-    # enumerates through player.items, shows enumerating number next to each item making it easier to select an item.
-    item2 = []
-    keys = []
-    for i in player.items2:
-        item2 = list(i.values())
-        keys = list(i.keys())
-    text = "\n".join("> [{}] {}".format(n, i) for n, i in enumerate(item2, start=1))
-    if 'healing potion' in item2 or 'resistance potion' in item2:
-        print('Select an item to use: (1, 2 , 3 etc).')
-        use = int(input(f'Type \'exit\' to exit menu \n{text}\n'))
-        item = keys[use-1]
-        print(item)
-        time.sleep(10)
-        item.useItem(player)
-
-    elif 'healing potion' not in item2keys or 'resistance potion' not in\
-            item2keys:
-
-        print('You have no items to use.')
-        time.sleep(2)
-
 # defines function for player and enemy to fight until either wins.
 def fight(hero, enemy, first_move):
     clear()
@@ -266,22 +259,22 @@ def fight(hero, enemy, first_move):
         if enemy == villan:
             return villan
         
-
 # defines the function to craft the weapon needed to beat the main villan.
 def craft():
     if 'iron' in player.items1 and 'steel file' in player.items1\
             and 'cloth' in player.items1:
         clear()
-        print('You can craft a sharpened iron.')
-        action = input('Do you wish to craft a sharpened iron? (y/n)\n')
+        print('You can craft a sword.')
+        action = input('Do you want to craft a sword? (y/n)\n')
         if action == 'y':
             player.damage_mult = 2
             player.items1.remove('iron')
             player.items1.remove('cloth')
-            sword = items('sword', 0, 0, 20, False, player.items1)
-            player.items1.append(sword.name)
+            player.items1.remove('steel file')
+            sword = items('sword', 0, 0, 20, False, player.items1, effects='+20 damage')
             clear()
-            print('You have crafted a sharpened iron.')
+            print('You have crafted a sword.')
+            sword.addItem(player)
             time.sleep(2)
         elif action == 'n':
             clear()
@@ -300,32 +293,7 @@ def craft():
         clear()
         print('There are no items available to craft. Collect more supplies.')
         time.sleep(2)
-
-# defines function for searching the rooms, and obtaining items.
-# def search_room(room):
-#     clear()
-#     if room in items:
-#         print('Possible items:', items[room])
-#         choice = input('Do you want to take this item? (y/n) ').lower()
-#         if choice == 'y':
-#             try:
-#                 clear()
-#                 if items[room] == 'magic necklace':
-#                     print(f'+ 15% resistance.')
-#                     player.resistance += 15
-#                 print(f'You have taken the {items[room]}')
-#                 player.items.append(''.join(items[room]))
-#                 player.item = items.pop(room)
-#                 time.sleep(1.5)
-#             except Exception:
-#                 clear()
-#                 print('There are no items in this room.')
-#                 time.sleep(1.5)
-#     elif room not in items:
-#         clear()
-#         print('There are no items in this room.')
-#         time.sleep(1.5)
-        
+   
 def search_room(room):
     clear()
     room_items = None
@@ -507,7 +475,7 @@ def main():
             elif choice[0][0] == 'c':
                 craft()
             elif choice[0][0] == 'u':
-                use_item()
+                player.useItem()
             elif choice[0][0] == 'i':
                 show_items()
             elif choice[0][0] == 'h':
