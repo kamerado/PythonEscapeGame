@@ -417,11 +417,11 @@ def if_fight():
     while True:
         if player.current_room == guard.current_room:
             print(f'{room_desc[player.current_room]}')
-            choice1 = input('Do you wish to fight the theif? (y/n)\n')
+            choice1 = input(f'Do you wish to fight the {guard.name}? (y/n)\n')
             if choice1 == 'y':
                 fight(player, guard, player)
             elif choice1 == 'n':
-                print('the thief notices you and attacks!')
+                print(f'the {guard.name} notices you and attacks!')
                 fight(player, guard, guard)
             else:
                 clear()
