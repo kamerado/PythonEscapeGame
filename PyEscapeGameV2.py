@@ -26,35 +26,35 @@ start         exit
 # "*" = current room on the map. 
 map_code = {
     'Cell': 42,
-    'Hallway': 56,
-    'Study': 120,
-    'Dining Room': 127,
+    'Cave Opening': 56,
+    'Cave Hallway': 120,
+    'Barracks': 127,
     'Armory': 134,
     'Torture Room': 198,
-    'Storage Room': 205,
-    'Living Quarters': 212}
+    'Medical Room': 205,
+    'Storage Room': 212}
 
 # define room descriptions.
 room_desc = {
     'Cell': 'You are in a dark cell.',
-    'Study': 'You are in a what looks like a Study.',
+    'Cave Hallway': 'You are in a what looks like a Cave Hallway.',
     'Torture Room': 'You are in a small torture room, you see some loose scrap metal.',
-    'Dining Room': 'You find an angry looking man eating at a table.',
-    'Storage Room': 'You find a room containing shelfs.',
-    'Living Quarters': 'You wander down into the Living Quarters, there are many storage boxes.',
+    'Barracks': 'You find an angry looking man eating at a table.',
+    'Medical Room': 'You find a room containing shelfs.',
+    'Storage Room': 'You wander down into the Storage Room, there are many storage boxes.',
     'Armory': 'You walk into a Armory, it smells like someone died in here.',
-    'Hallway': 'You find the front hallway, but see an angry, huge man.'}
+    'Cave Opening': 'You find the front Cave Opening, but see an angry, huge man.'}
 
 # defines room layout.
 rooms = {
-    'Cell': {'south': 'Study'},
-    'Study': {'south': 'Torture Room', 'east': 'Dining Room', 'north': 'Cell'},
-    'Torture Room': {'north': 'Study'},
-    'Dining Room': {'south': 'Storage Room', 'west': 'Study'},
-    'Storage Room': {'east': 'Living Quarters', 'north': 'Dining Room'},
-    'Living Quarters': {'west': 'Storage Room', 'north': 'Armory'},
-    'Armory': {'north': 'Hallway', 'south': 'Living Quarters'},
-    'Hallway': {'south': 'Dining Room'}}
+    'Cell': {'south': 'Cave Hallway'},
+    'Cave Hallway': {'south': 'Torture Room', 'east': 'Barracks', 'north': 'Cell'},
+    'Torture Room': {'north': 'Cave Hallway'},
+    'Barracks': {'south': 'Medical Room', 'west': 'Cave Hallway'},
+    'Medical Room': {'east': 'Storage Room', 'north': 'Barracks'},
+    'Storage Room': {'west': 'Medical Room', 'north': 'Armory'},
+    'Armory': {'north': 'Cave Opening', 'south': 'Storage Room'},
+    'Cave Opening': {'south': 'Armory'}}
 
 # create item objects and assign them to indavidual rooms.
 class items():
@@ -95,12 +95,12 @@ class items():
             print(f'You have used: {self.name}')
             print(f'{self.effects}')
 # creates items and sets atributes and room location.
-item1 = items('healing potion', 50, 0, 0, True, 'Storage Room', effects='+50 HP.')
-item2 = items('magic necklace', 0, 15, 0, False, 'Dining Room', effects=f'+15% resistance.')
-item3 = items('cloth', 0, 0, 0, False, 'Study')
+item1 = items('healing potion', 50, 0, 0, True, 'Medical Room', effects='+50 HP.')
+item2 = items('magic necklace', 0, 15, 0, False, 'Barracks', effects=f'+15% resistance.')
+item3 = items('cloth', 0, 0, 0, False, 'Cave Hallway')
 item4 = items('iron', 0, 0, 0, False, 'Torture Room')
 item1 = items('resistance potion', 0, 15, 0, True, 'Armory', effects='+15 Resistance.')
-item1 = items('steel file', 0, 0, 0, False, 'Living Quarters')
+item1 = items('steel file', 0, 0, 0, False, 'Storage Room')
 
 # Creates classes for the player and enemy objects.
 class players():
@@ -144,13 +144,14 @@ class players():
                     print('Select an item to use: (1, 2 , 3 etc).')
                     use = int(input(f'Type \'exit\' to exit menu \n{text}\n'))
                     out = keys[use-1]
+                    clear()
                     out.useItem(self)
+                    time.sleep(2)
                     self.items2[:] = [i for i in self.items2 if str(keys[use-1]) not in str(i.keys())]
                 elif 'healing potion' not in out or 'resistance potion' not in\
                         out:
                     print('You have no items to use.')
                     time.sleep(2)
-
 
     # defines enemy character stats.
     class enemy():
@@ -169,15 +170,15 @@ class players():
         # defines function to calculate damage of enemy attacks.
         def calcdam(self):
             dmg = random.randint(self.min_damage, self.max_damage)
-            if self.name == 'The badman':
+            if self.name == 'Raider Leader':
                 if random.randint(1,100) == random.randint(1,100):
                     print('Critical hit!')
-                    dmg += random.randint(20,50)
+                    dmg += random.randint(30,50)
             return dmg
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
-villan = players.enemy('The badman', 250, 20, 40, 'Hallway')
-guard = players.enemy('Dumb Henchman', 50, 0, 15, 'Dining Room')
+villan = players.enemy('Raider Leader', 250, 20, 40, 'Cave Opening')
+guard = players.enemy('Raider Henchman', 50, 0, 15, 'Barracks')
 
 # small introduction into the game, allows you to give yourself a name,
 clear()
@@ -192,6 +193,7 @@ action = ''
 while action != 'e':  # using while loop to make sure program won't crash.
     text = 'Press e to break chains on rocks: '
     action = input("\x1B[3m" + text + "\x1B[0m")
+
 clear()
 print('\nDon\'t try to escape! They will torture you!')
 time.sleep(2)
@@ -431,11 +433,11 @@ def if_fight():
 
         elif player.current_room == villan.current_room:
             print(f'{room_desc[player.current_room]}')
-            choice2 = input('Do you wish to fight The theif leader? (y/n)\n')
+            choice2 = input(f'Do you wish to fight The {villan.name}? (y/n)\n')
             if choice2 == 'y':
                 loser = fight(player, villan, player)
             elif choice2 == 'n':
-                print('The theif leader attacks!')
+                print(f'The {villan.name} attacks!')
                 loser = fight(player, villan, villan)
             else:
                 clear()
@@ -452,7 +454,7 @@ def if_fight():
 
 def main():
     clear()
-    while player.hp > 0 and villan.current_room == 'Hallway':
+    while player.hp > 0 and villan.current_room == 'Cave Opening':
         result = if_fight()
         if result != None:  # check for game ending scenareo.
             return result
@@ -489,44 +491,16 @@ def main():
 def ending_sequence(result):
     if result == 'win':
         clear()
-        print('You have escaped your inevitable demise!')
-        print('Do you wish to save the other hostage?')
-        choice = input("'y' for yes, 'n' for no: ")
-        if choice == 'y':
-            clear()
-            print('You both escape into the sunset...')
-            time.sleep(2)
-        elif choice == 'n':
-            clear()
-            print("You lose karma.")
-            time.sleep(2)
-        clear()
-        print(winner)
+        print('You have escaped!')
+        print('Winner!')
         time.sleep(3)
         clear()
     elif result == 'lose':
         clear()
-        print(gameover)
+        print('Collect items and craft a weapon to become stronger.')
+        print('Game Over!')
         time.sleep(3)
         clear()
-winner = '''
- _     _  ___   __    _  __    _  __    _  _______  ______    __  
-| | _ | ||   | |  |  | ||  |  | ||  |  | ||       ||    _ |  |  | 
-| || || ||   | |   |_| ||   |_| ||   |_| ||    ___||   | ||  |  | 
-|       ||   | |       ||       ||       ||   |___ |   |_||_ |  | 
-|       ||   | |  _    ||  _    ||  _    ||    ___||    __  ||__| 
-|   _   ||   | | | |   || | |   || | |   ||   |___ |   |  | | __  
-|__| |__||___| |_|  |__||_|  |__||_|  |__||_______||___|  |_||__| 
-'''
-gameover = '''
- ___      _______  _______  _______  ______    __  
-|   |    |       ||       ||       ||    _ |  |  | 
-|   |    |   _   ||  _____||    ___||   | ||  |  | 
-|   |    |  | |  || |_____ |   |___ |   |_||_ |  | 
-|   |___ |  |_|  ||_____  ||    ___||    __  ||__| 
-|       ||       | _____| ||   |___ |   |  | | __  
-|_______||_______||_______||_______||___|  |_||__| 
-'''
 
 # function containing main loop.
 if __name__ == '__main__':
