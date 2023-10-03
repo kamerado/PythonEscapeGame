@@ -362,7 +362,6 @@ def possible_actions():
 def possible_movement(room):
     return (f'Possible directions are: {" or ".join(rooms[room])}')
 
-
 # defines function for navigating through conqurent rooms.
 def goto(room, dir):
     clear()
