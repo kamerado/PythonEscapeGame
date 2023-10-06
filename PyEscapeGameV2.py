@@ -1,7 +1,7 @@
 import random  # using random to calculate random integers for attack damage.
 import time  # using time to make the script sleep for a specified amount of seconds.
 
-# using time and clear() to clear terminal and make script sleep breifly to
+# using time and clear() to clear terminal, and make script sleep breifly to
 # allow the script to be easier to follow. this makes the screen show only updated game data.
 def clear():
     print("\x1B[2J")
