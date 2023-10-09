@@ -1,7 +1,7 @@
 import random  # using random to calculate random integers for attack damage.
 import time  # using time to make the script sleep for a specified amount of seconds.
 
-# using time and clear() to clear terminal and make script sleep breifly to
+# using time and clear() to clear terminal, and make script sleep breifly to
 # allow the script to be easier to follow. this makes the screen show only updated game data.
 def clear():
     print("\x1B[2J")
@@ -177,8 +177,8 @@ class players():
             return dmg
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
-villan = players.enemy('Raider Leader', 250, 20, 40, 'Cave Opening')
-guard = players.enemy('Raider Henchman', 50, 0, 15, 'Barracks')
+villan = players.enemy('Raider Leader', 250, 45, 80, 'Cave Opening')
+guard = players.enemy('Raider Henchman', 50, 5, 20, 'Barracks')
 
 # small introduction into the game, allows you to give yourself a name,
 clear()
@@ -361,7 +361,6 @@ def possible_actions():
 # defines function that shows the direction of conqurent rooms.
 def possible_movement(room):
     return (f'Possible directions are: {" or ".join(rooms[room])}')
-
 
 # defines function for navigating through conqurent rooms.
 def goto(room, dir):

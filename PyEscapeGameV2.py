@@ -177,8 +177,8 @@ class players():
             return dmg
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
-villan = players.enemy('Raider Leader', 250, 20, 40, 'Cave Opening')
-guard = players.enemy('Raider Henchman', 50, 0, 15, 'Barracks')
+villan = players.enemy('Raider Leader', 250, 45, 80, 'Cave Opening')
+guard = players.enemy('Raider Henchman', 50, 5, 20, 'Barracks')
 
 # small introduction into the game, allows you to give yourself a name,
 clear()
