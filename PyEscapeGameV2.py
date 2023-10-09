@@ -59,16 +59,19 @@ rooms = {
 # create item objects and assign them to indavidual rooms.
 class items():
     _registry = []
+    
+    # set item attributes. Accounting for things like consumable vs non-consumable, location, hp, damage, resistance and name.
     def __init__(self, name, hpAdd, resistAdd, damAdd, useable, location, **kwargs):
-        self._registry.append(self)
+        self._registry.append(self) # appends to registry for searching for items in rooms. this makes the item objects iterable.
         self.name = name
         self.hpAdd = hpAdd
         self.resistAdd = resistAdd
         self.damAdd = damAdd
         self.useable = useable
         self.location = location
-        for i, x in kwargs.items():
+        for i, x in kwargs.items(): # accounting for the consumable item effect output strings.
             self.effects = x
+    # this function handles adding items to the player inventory. if item grants passive effects, they will be applied.
     def addItem(self, player):
         if self.useable == False:
             player.items1.append(self.name)
@@ -77,11 +80,8 @@ class items():
             player.min_damage += int(self.damAdd/2)
             player.max_damage += int(self.damAdd)
             self._registry.remove(self)
-            try:
-                if self.effects != None:
-                    print(self.effects)
-            except Exception as error:
-                return
+            if self.effects != None:
+                print(self.effects) # prints to screen the effect given to player.
             del self
         else:
             player.items2.append({self: self.name})
@@ -178,7 +178,7 @@ item1 = items('resistance potion', 0, 15, 0, True, 'Armory', effects='+15 Resist
 item1 = items('steel file', 0, 0, 0, False, 'Storage Room')
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
-villan = players.enemy('Raider Leader', 250, 45, 80, 'Cave Opening')
+villan = players.enemy('Raider Leader', 250, 35, 65, 'Cave Opening')
 guard = players.enemy('Raider Henchman', 50, 5, 20, 'Barracks')
 
 # small introduction into the game, allows you to give yourself a name,
