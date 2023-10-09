@@ -94,13 +94,6 @@ class items():
             player.max_damage += int(self.damAdd)
             print(f'You have used: {self.name}')
             print(f'{self.effects}')
-# creates items and sets atributes and room location.
-item1 = items('healing potion', 50, 0, 0, True, 'Medical Room', effects='+50 HP.')
-item2 = items('magic necklace', 0, 15, 0, False, 'Barracks', effects=f'+15% resistance.')
-item3 = items('cloth', 0, 0, 0, False, 'Cave Hallway')
-item4 = items('iron', 0, 0, 0, False, 'Torture Room')
-item1 = items('resistance potion', 0, 15, 0, True, 'Armory', effects='+15 Resistance.')
-item1 = items('steel file', 0, 0, 0, False, 'Storage Room')
 
 # Creates classes for the player and enemy objects.
 class players():
@@ -175,6 +168,14 @@ class players():
                     print('Critical hit!')
                     dmg += random.randint(30,50)
             return dmg
+
+# creates items and sets atributes and room location.
+item1 = items('healing potion', 50, 0, 0, True, 'Medical Room', effects='+50 HP.')
+item2 = items('magic necklace', 0, 15, 0, False, 'Barracks', effects=f'+15% resistance.')
+item3 = items('cloth', 0, 0, 0, False, 'Cave Hallway')
+item4 = items('iron', 0, 0, 0, False, 'Torture Room')
+item1 = items('resistance potion', 0, 15, 0, True, 'Armory', effects='+15 Resistance.')
+item1 = items('steel file', 0, 0, 0, False, 'Storage Room')
 
 # creates enemy objects and sets hp and minimum/maximum attack damage.
 villan = players.enemy('Raider Leader', 250, 45, 80, 'Cave Opening')
