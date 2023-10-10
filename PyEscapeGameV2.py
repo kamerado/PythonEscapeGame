@@ -270,17 +270,12 @@ class players():
                 print('You have walked into a wall.')
                 time.sleep(2)
                 return
-            try:
-                self.map = self.map[:map_code[self.current_room]] + ' ' + self.map[map_code[self.current_room]+1:]
-                self.current_room = rooms[self.current_room][move]  # changes current room.
-                self.map = self.map[:map_code[self.current_room]] + '*' + self.map[map_code[self.current_room]+1:]
-                clear()
-                print('You have moved to the', move + '.')
-                time.sleep(2)
-            except Exception:
-                clear()
-                print('You walked into the wall.')
-                time.sleep(2)
+            self.map = self.map[:map_code[self.current_room]] + ' ' + self.map[map_code[self.current_room]+1:]
+            self.current_room = rooms[self.current_room][move]  # changes current room.
+            self.map = self.map[:map_code[self.current_room]] + '*' + self.map[map_code[self.current_room]+1:]
+            clear()
+            print('You have moved to the', move + '.')
+            time.sleep(2)
 
     # defines enemy character stats.
     class enemy():
@@ -377,8 +372,9 @@ def introdec(function): # decorator for main function. packs intro before main a
         print('\nWell...', player.name + '...\nWe\'ve been captured by the a group')
         print('of raiders who plan to hold us for randsom...')
         action = ''
-        while action != 'e':  # using while loop to make sure program won't crash.
-            text = 'Press e to break chains on rocks: '
+        while action == '':  # using while loop to make sure program won't crash.
+            clear()
+            text = 'enter anything to break chains on rocks: '
             action = input("\x1B[3m" + text + "\x1B[0m")
         clear()
         print('\nDon\'t try to escape! They will torture you!')
