@@ -57,7 +57,7 @@ rooms = {
     'Cave Opening': {'south': 'Armory'}}
 
 # create item objects and assign them to indavidual rooms.
-class items():
+class Items():
     _registry: list[object] = []
     # set item attributes. Accounting for things like consumable vs non-consumable, location, hp, damage, resistance and name.
     def __init__(self, name, hpAdd, resistAdd, damAdd, useable, location, effects):
@@ -77,8 +77,8 @@ class items():
             player.resistance += int(self.resistAdd)
             player.min_damage += int(self.damAdd/2)
             player.max_damage += int(self.damAdd)
-            items._registry.remove(self)
-            if self.effects is None:
+            self._registry.remove(self)
+            if self.effects is not None:
                 print(self.effects) # prints to screen the effect given to player.
             self.location = player.items1
         else:
@@ -94,8 +94,8 @@ class items():
             print(f'{self.effects}')
 
 # Creates classes for the player and enemy objects.
-class players():
-    class hero():
+class Players():
+    class Hero():
         # defines player stats. as player moves around, takes damage, and uses items,
         # these stats will change and the data will be persistent until program is over, or objects are destroyed.
         def __init__(self, name):
@@ -162,7 +162,7 @@ class players():
                     self.items1.remove('iron')
                     self.items1.remove('cloth')
                     self.items1.remove('steel file')
-                    sword = items('sword', 0, 0, 20, False, self.items1, effects='+20 damage')
+                    sword = Items('sword', 0, 0, 20, False, self.items1, effects='+20 damage')
                     sword.addItem(self)
                     clear()
                     print('You have crafted a sword.')
@@ -181,7 +181,7 @@ class players():
         # function to search current room.
         def search_room(self):
             room_items = None
-            for i in items._registry:
+            for i in Items._registry:
                 if i.location == self.current_room:
                     room_items = i
             if room_items == None:
@@ -228,7 +228,7 @@ class players():
         # function to check if player in an enemy room and initiates fight sequence.
         def if_fight(self):
             enemy = None
-            for i in players.enemy._eregistry:
+            for i in Players.Enemy._eregistry:
                 if i.current_room == self.current_room:
                     enemy = i
             while True:
@@ -278,7 +278,7 @@ class players():
             time.sleep(2)
 
     # defines enemy character stats.
-    class enemy():
+    class Enemy():
         _eregistry: list[object] = []
         def __init__(self, name, hp, min_damage, max_damage, current_room):
             self._eregistry.append(self)
@@ -303,19 +303,19 @@ class players():
             return dmg
 
 # creates items and sets atributes and room location.
-item1 = items('healing potion', 75, 0, 0, True, 'Medical Room', '+75 HP.')
-item2 = items('magic necklace', 0, 15, 0, False, 'Barracks', f'+15% resistance.')
-item3 = items('cloth', 0, 0, 0, False, 'Cave Hallway', None)
-item4 = items('iron', 0, 0, 0, False, 'Torture Room', None)
-item5 = items('resistance potion', 0, 15, 0, True, 'Armory', '+15 Resistance.')
-item6 = items('steel file', 0, 0, 0, False, 'Storage Room', None)
+item1 = Items('healing potion', 75, 0, 0, True, 'Medical Room', '+75 HP.')
+item2 = Items('magic necklace', 0, 15, 0, False, 'Barracks', f'+15% resistance.')
+item3 = Items('cloth', 0, 0, 0, False, 'Cave Hallway', None)
+item4 = Items('iron', 0, 0, 0, False, 'Torture Room', None)
+item5 = Items('resistance potion', 0, 15, 0, True, 'Armory', '+15 Resistance.')
+item6 = Items('steel file', 0, 0, 0, False, 'Storage Room', None)
 
 clear()
 print('\nRandom man: Finally you\'re awake! Whats your name?') # start of intro. must initialize player and enemy objects globally for this to work.
 playername = input('Enter username: ') # allowing user to input a username.
-player = players.hero(playername) # initialize player object.
-villan = players.enemy('Raider Leader', 250, 35, 65, 'Cave Opening') # creates enemy objects and sets hp and minimum/maximum attack damage.
-guard = players.enemy('Raider Henchman', 50, 5, 20, 'Barracks')
+player = Players.Hero(playername) # initialize player object.
+villan = Players.Enemy('Raider Leader', 250, 35, 65, 'Cave Opening') # creates enemy objects and sets hp and minimum/maximum attack damage.
+guard = Players.Enemy('Raider Henchman', 50, 5, 20, 'Barracks')
 
 # defines function for player and enemy to fight until either wins.
 def fight(hero, enemy, first_move):
@@ -330,7 +330,7 @@ def fight(hero, enemy, first_move):
             print(f'{hero.name} health:', str(hero.hp) + '.')
             print(f'{enemy.name} health:', str(enemy.hp) + '.')
             print(f'You can either use \'a\' attack, or \'u\' use items.')
-            move = input('choice: \n')
+            move = input('choice: ')
             if move == 'a':
                 enemy.takedamage(hero.calcdam())
                 turn = enemy
