@@ -39,11 +39,11 @@ room_desc = {
     'Cell': 'You are in a dark cell.',
     'Cave Hallway': 'You are in a what looks like a Cave Hallway.',
     'Torture Room': 'You are in a small torture room, you see some loose scrap metal.',
-    'Barracks': f'You a raider eating at a table.',
+    'Barracks': 'You see a raider eating at a table.',
     'Medical Room': 'You find a room containing shelfs.',
     'Storage Room': 'You wander down into the Storage Room, there are many storage boxes.',
     'Armory': 'You walk into a Armory, it smells like someone died in here.',
-    'Cave Opening': f'You find the front Cave Opening, but see the raider leader.'}
+    'Cave Opening': 'You find the front Cave Opening, but see the raider leader.'}
 
 # defines room layout.
 rooms = {
@@ -78,7 +78,7 @@ class items():
             player.min_damage += int(self.damAdd/2)
             player.max_damage += int(self.damAdd)
             items._registry.remove(self)
-            if self.effects != None:
+            if self.effects is None:
                 print(self.effects) # prints to screen the effect given to player.
             self.location = player.items1
         else:
@@ -387,6 +387,7 @@ def introdec(function): # decorator for main function. packs intro before main a
 @introdec
 def main():
     clear()
+    choices = {'g': player.goto, 's': player.search_room, 'c': player.craft, 'u': player.useItem, 'i': player.show_items, 'h':  player.instr}
     while player.hp > 0 and villan.current_room == 'Cave Opening':
         result = player.if_fight()
         if result != None:  # check for game ending scenareo.
@@ -403,7 +404,6 @@ def main():
         choice = []
         if choice == []:
             choice = [i for i in input('Enter move: ').lower() if i != ' ']
-            choices = {'g': player.goto, 's': player.search_room, 'c': player.craft, 'u': player.useItem, 'i': player.show_items, 'h':  player.instr}
             try:
                 if choice[0][0] == 'g':
                     choices[choice[0][0]](choice[1][0])
