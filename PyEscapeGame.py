@@ -136,12 +136,12 @@ class Players():
                     out = keys[use-1]
                     clear()
                     out.useItem(self)
-                    time.sleep(2)
+                    time.sleep(.5)
                     self.items2[:] = [i for i in self.items2 if str(keys[use-1]) not in str(i.keys())]
                 elif 'healing potion' not in out or 'resistance potion' not in\
                         out:
                     print('You have no items to use.')
-                    time.sleep(2)
+                    time.sleep(.5)
         # defines a function to show current room, hp, inventory.
         def status(self):
             print('Current room is:', self.current_room + '.')
@@ -166,18 +166,18 @@ class Players():
                     sword.addItem(self)
                     clear()
                     print('You have crafted a sword.')
-                    time.sleep(2)
+                    time.sleep(.5)
                 elif action == 'n':
                     pass
                 else:
                     clear()
                     print('Incorrect input.')
-                    time.sleep(2)
+                    time.sleep(.5)
                     craft()
             else:
                 clear()
                 print('There are no items available to craft. Collect more supplies.')
-                time.sleep(2)
+                time.sleep(.5)
         # function to search current room.
         def search_room(self):
             room_items = None
@@ -254,9 +254,9 @@ class Players():
         # defines function for navigating through conqurent rooms.
         def goto(self, move):
             clear()
+            dirs = {'s': 'south', 'e': 'east', 'w': 'west', 'n': 'north'}
             while True:
                 try:
-                    dirs = {'s': 'south', 'e': 'east', 'w': 'west', 'n': 'north'}
                     move = dirs[move]
                     break
                 except Exception:
@@ -373,7 +373,6 @@ def introdec(function): # decorator for main function. packs intro before main a
         print('of raiders who plan to hold us for randsom...')
         action = ''
         while action == '':  # using while loop to make sure program won't crash.
-            clear()
             text = 'enter anything to break chains on rocks: '
             action = input("\x1B[3m" + text + "\x1B[0m")
         clear()
@@ -408,7 +407,9 @@ def main():
                 if choice[0][0] == 'g':
                     choices[choice[0][0]](choice[1][0])
                 else:
+                    clear()
                     choices[choice[0][0]]()
+                    time.sleep(2)
             except Exception:
                 clear()
                 print('Invalid choice.')
