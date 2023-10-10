@@ -43,7 +43,7 @@ room_desc = {
     'Medical Room': 'You find a room containing shelfs.',
     'Storage Room': 'You wander down into the Storage Room, there are many storage boxes.',
     'Armory': 'You walk into a Armory, it smells like someone died in here.',
-    'Cave Opening': 'You find the front Cave Opening, but see an angry, huge man.'}
+    'Cave Opening': 'You find the front Cave Opening, but see the raider leader.'}
 
 # defines room layout.
 rooms = {
