@@ -270,6 +270,7 @@ class players():
                 print('You have walked into a wall.')
                 time.sleep(2)
                 return
+            # using map codes to update map and changing current room
             self.map = self.map[:map_code[self.current_room]] + ' ' + self.map[map_code[self.current_room]+1:]
             self.current_room = rooms[self.current_room][move]  # changes current room.
             self.map = self.map[:map_code[self.current_room]] + '*' + self.map[map_code[self.current_room]+1:]
