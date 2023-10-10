@@ -180,7 +180,6 @@ class players():
                 time.sleep(2)
         # function to search current room.
         def search_room(self):
-            clear()
             room_items = None
             for i in items._registry:
                 if i.location == self.current_room:
@@ -205,7 +204,7 @@ class players():
                 else:
                     clear()
                     print('Invalid choice.')
-                    time.sleep(2)
+                    time.sleep(1.5)
                     choice = None
                     continue
         # defines function to show current inventory.
